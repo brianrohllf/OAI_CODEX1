@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sleeper FAAB Optimizer</title>
+    <style>
+      body { font-family: Arial, sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+      .card { border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+      label { display: block; margin-top: 0.7rem; font-weight: 600; }
+      input { width: 100%; padding: 0.5rem; margin-top: 0.2rem; box-sizing: border-box; }
+      button { margin-top: 1rem; padding: 0.6rem 1rem; }
+      .success { color: #0a7d27; }
+      .error { color: #b00020; }
+      code { background: #f2f2f2; padding: 0.1rem 0.3rem; }
+    </style>
+  </head>
+  <body>
+    <h1>Sleeper FAAB Optimizer</h1>
+    <p>Run this app locally to train and generate recommendations from your Sleeper history JSON.</p>
+
+    <div class="card">
+      <h2>Train Model</h2>
+      <form method="post" action="/train">
+        <label for="history_path">History JSON Path</label>
+        <input id="history_path" name="history_path" value="data/history.json" required>
+
+        <label for="rankings_path">Rankings CSV Path (optional)</label>
+        <input id="rankings_path" name="rankings_path" value="data/rankings.csv">
+
+        <label for="model_path_train">Model Output Path</label>
+        <input id="model_path_train" name="model_path" value="models/fab_bid_model.joblib" required>
+
+        <button type="submit">Train</button>
+      </form>
+      {% if train_success %}
+      <p class="success">{{ train_success }}</p>
+      {% endif %}
+      {% if train_error %}
+      <p class="error">{{ train_error }}</p>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h2>Recommend Bid</h2>
+      <form method="post" action="/recommend">
+        <label for="model_path_recommend">Model Path</label>
+        <input id="model_path_recommend" name="model_path" value="models/fab_bid_model.joblib" required>
+
+        <label for="league_id">League ID</label>
+        <input id="league_id" name="league_id" placeholder="1234567890" required>
+
+        <label for="season">Season</label>
+        <input id="season" name="season" value="2025" required>
+
+        <label for="week">Week</label>
+        <input id="week" name="week" value="1" required>
+
+        <label for="winner_count">Expected Competing Bidders</label>
+        <input id="winner_count" name="winner_count" value="3" required>
+
+        <label for="rank_score">Player Rank Score</label>
+        <input id="rank_score" name="rank_score" value="0.85" required>
+
+        <button type="submit">Recommend</button>
+      </form>
+      {% if recommendation %}
+      <p class="success">{{ recommendation }}</p>
+      {% endif %}
+      {% if recommend_error %}
+      <p class="error">{{ recommend_error }}</p>
+      {% endif %}
+    </div>
+
+    <p>Tip: collect data first with CLI: <code>fab-opt collect --username YOUR_NAME --season 2024</code></p>
+  </body>
+</html>
